@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>B.L.O.X. — Terminal</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #00ff66;
+            font-family: Consolas, monospace;
+            height: 100vh;
+        }
+
+        #terminal {
+            box-sizing: border-box;
+            padding: 25px;
+            height: 100vh;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .line {
+            margin-bottom: 6px;
+        }
+
+        .input-line {
+            display: flex;
+        }
+
+        .prompt {
+            margin-right: 8px;
+        }
+
+        #input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #00ff66;
+            font-family: Consolas, monospace;
+            font-size: 16px;
+        }
+
+        #input::placeholder {
+            color: #006622;
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="terminal">
+
+    <div class="line">
+        B.L.O.X. RESEARCH TERMINAL
+    </div>
+
+    <div class="line">
+        SYSTEM STATUS: ONLINE
+    </div>
+
+    <div class="line">
+        TYPE A COMMAND BELOW.
+    </div>
+
+    <br>
+
+    <div id="output"></div>
+
+    <div class="input-line">
+        <span class="prompt">&gt;</span>
+        <input id="input" type="text" placeholder="(placeholder text)" autofocus>
+    </div>
+
+</div>
+
+<script>
+
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+
+function addLine(text) {
+    const line = document.createElement("div");
+    line.className = "line";
+    line.textContent = "> " + text;
+    output.appendChild(line);
+}
+
+input.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+        const command = input.value.trim();
+
+        if (command !== "") {
+
+            addLine(command);
+
+            // Commands can be added here later.
+
+            if (command.toLowerCase() === "help") {
+                addLine("AVAILABLE COMMANDS: HELP");
+            }
+            else if (command.toLowerCase() === "clear") {
+                output.innerHTML = "";
+            }
+            else {
+                addLine("COMMAND NOT RECOGNIZED.");
+            }
+
+        }
+
+        input.value = "";
+    }
+
+});
+
+</script>
+
+</body>
+</html>
