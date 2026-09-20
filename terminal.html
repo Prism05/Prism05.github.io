@@ -8,20 +8,20 @@
             margin: 0;
             background: #000;
             color: #00ff66;
-            font-family: Consolas, monospace;
-            height: 100vh;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 15px;
         }
 
         #terminal {
             box-sizing: border-box;
+            min-height: 100vh;
             padding: 25px;
-            height: 100vh;
             overflow-y: auto;
-            white-space: pre-wrap;
         }
 
         .line {
-            margin-bottom: 6px;
+            margin-bottom: 7px;
+            white-space: pre-wrap;
         }
 
         .input-line {
@@ -38,22 +38,12 @@
             border: none;
             outline: none;
             color: #00ff66;
-            font-family: Consolas, monospace;
-            font-size: 16px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 15px;
         }
 
         #input::placeholder {
-            color: #006622;
-        }
-
-        .cursor {
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
+            color: #006b2b;
         }
     </style>
 </head>
@@ -62,25 +52,19 @@
 
 <div id="terminal">
 
-    <div class="line">
-        B.L.O.X. RESEARCH TERMINAL
-    </div>
-
-    <div class="line">
-        SYSTEM STATUS: ONLINE
-    </div>
-
-    <div class="line">
-        TYPE A COMMAND BELOW.
-    </div>
-
-    <br>
+    <div class="line">B.L.O.X. RESEARCH TERMINAL</div>
+    <div class="line">--------------------------------</div>
+    <div class="line">SYSTEM STATUS: ONLINE</div>
+    <div class="line">ACCESS LEVEL: PUBLIC</div>
+    <div class="line"></div>
+    <div class="line">TYPE "HELP" FOR AVAILABLE COMMANDS.</div>
+    <div class="line"></div>
 
     <div id="output"></div>
 
     <div class="input-line">
         <span class="prompt">&gt;</span>
-        <input id="input" type="text" placeholder="(placeholder text)" autofocus>
+        <input id="input" type="text" autofocus autocomplete="off" placeholder="(placeholder text)">
     </div>
 
 </div>
@@ -90,38 +74,184 @@
 const input = document.getElementById("input");
 const output = document.getElementById("output");
 
+let overrideMode = false;
+
 function addLine(text) {
+
     const line = document.createElement("div");
+
     line.className = "line";
+
     line.textContent = "> " + text;
+
     output.appendChild(line);
+
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+function addSystem(text) {
+
+    const line = document.createElement("div");
+
+    line.className = "line";
+
+    line.textContent = text;
+
+    output.appendChild(line);
+
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
 input.addEventListener("keydown", function(event) {
 
-    if (event.key === "Enter") {
+    if (event.key !== "Enter") {
+        return;
+    }
 
-        const command = input.value.trim();
+    const command = input.value.trim();
 
-        if (command !== "") {
+    if (command === "") {
+        return;
+    }
 
-            addLine(command);
+    addLine(command);
 
-            // Commands can be added here later.
+    input.value = "";
 
-            if (command.toLowerCase() === "help") {
-                addLine("AVAILABLE COMMANDS: HELP");
-            }
-            else if (command.toLowerCase() === "clear") {
-                output.innerHTML = "";
-            }
-            else {
-                addLine("COMMAND NOT RECOGNIZED.");
-            }
+    /*
+        HELP
+    */
+
+    if (command.toLowerCase() === "help") {
+
+        addSystem("AVAILABLE COMMANDS:");
+        addSystem("HELP");
+        addSystem("STATUS");
+        addSystem("CLEAR");
+        addSystem("/override");
+
+    }
+
+    /*
+        STATUS
+    */
+
+    else if (command.toLowerCase() === "status") {
+
+        addSystem("SYSTEM: ONLINE");
+        addSystem("NETWORK: CONNECTED");
+        addSystem("ACCESS: PUBLIC");
+
+        if (overrideMode) {
+            addSystem("OVERRIDE: ACTIVE");
+        }
+
+    }
+
+    /*
+        CLEAR
+    */
+
+    else if (command.toLowerCase() === "clear") {
+
+        output.innerHTML = "";
+
+    }
+
+    /*
+        OVERRIDE
+    */
+
+    else if (command.toLowerCase() === "/override") {
+
+        if (overrideMode) {
+
+            addSystem("OVERRIDE ALREADY ACTIVE.");
+
+        } else {
+
+            addSystem("WARNING: RESTRICTED COMMAND");
+            addSystem("SECURITY OVERRIDE REQUESTED.");
+            addSystem("ENTER AUTHORIZATION CODE.");
+
+            overrideMode = "waiting";
 
         }
 
-        input.value = "";
+    }
+
+    /*
+        AUTHORIZATION CODE
+    */
+
+    else if (overrideMode === "waiting") {
+
+        if (command === "668876") {
+
+            overrideMode = true;
+
+            addSystem("AUTHORIZATION ACCEPTED.");
+            addSystem("OVERRIDE CODE: 668876");
+            addSystem("ACCESS LEVEL: DIRECTOR");
+            addSystem("");
+            addSystem("RESTRICTED ARCHIVE DIRECTORY:");
+            addSystem("[01] 1997 ARCHIVE");
+            addSystem("");
+            addSystem("TYPE: 1997");
+
+        } else {
+
+            addSystem("AUTHORIZATION DENIED.");
+            addSystem("INVALID CODE.");
+
+            overrideMode = false;
+
+        }
+
+    }
+
+    /*
+        HIDDEN 1997 ARCHIVE
+    */
+
+    else if (
+        command.toLowerCase() === "1997" &&
+        overrideMode === true
+    ) {
+
+        addSystem("OPENING ARCHIVE...");
+        addSystem("ARCHIVE ID: BLOX-1997");
+        addSystem("ACCESS GRANTED.");
+
+        setTimeout(function() {
+
+            window.location.href = "1997.html";
+
+        }, 1000);
+
+    }
+
+    /*
+        RESTRICTED COMMANDS
+    */
+
+    else if (
+        command.toLowerCase() === "1997" &&
+        overrideMode !== true
+    ) {
+
+        addSystem("ACCESS DENIED.");
+
+    }
+
+    /*
+        UNKNOWN COMMAND
+    */
+
+    else {
+
+        addSystem("COMMAND NOT RECOGNIZED.");
+
     }
 
 });
